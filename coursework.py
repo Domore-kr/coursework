@@ -3,14 +3,16 @@ import json
 import yadisk
 
 
-def load_ya(id, yaTOKEN):
+def load_ya(id, yaTOKEN, album=input('Выберите область, из которой необходимо выгрузить фотографии:'
+                                     'wall — фотографии со стены,'
+                                     'profile — фотографии профиля ')):
     token = '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f95c04217915c32008'
     URL = 'https://api.vk.com/method/photos.get'
     params = {
         'user_ids': f'{id}',
         'access_token': token,
         'v': '5.131',
-        'album_id': 'profile',
+        'album_id': f'{album}',
         'extended': 1,
         'photo_sizes': 1
     }
