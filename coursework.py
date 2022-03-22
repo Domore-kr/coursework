@@ -1,11 +1,13 @@
 import requests
 import json
 import yadisk
+from pprint import pprint
 
 
 def load_ya(id, yaTOKEN, album=input('Выберите область, из которой необходимо выгрузить фотографии:'
                                      'wall — фотографии со стены,'
-                                     'profile — фотографии профиля ')):
+                                     'profile — фотографии профиля: '),
+            name=input('Введите название для папки: ')):
     token = '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f95c04217915c32008'
     URL = 'https://api.vk.com/method/photos.get'
     params = {
@@ -20,18 +22,28 @@ def load_ya(id, yaTOKEN, album=input('Выберите область, из ко
     with open(f'{id}.json', 'w') as photo:
         name_dict = {}
         name_list = []
+        filter = []
         y = yadisk.YaDisk(token=yaTOKEN)
-        y.mkdir(f"/{id}/")
+        y.mkdir(f"/{name}/")
         for i in res.json()['response']['items']:
             photo_params = i["likes"]["count"]
             name_dict['file_name'] = f'{photo_params}.jpg'
             name_dict['size'] = i['sizes'][-1]['type']
             name_list.append(name_dict)
             p = requests.get(i['sizes'][-1]['url'])
-            out = open(f'{photo_params}.jpg', "wb")
-            out.write(p.content)
-            y.upload(f'{photo_params}.jpg', f"/{id}/{photo_params}.jpg'")
-            out.close()
+            if photo_params in filter:
+                photo_params = i['date']
+                filter.append(photo_params)
+                out = open(f'{photo_params}.jpg', "wb")
+                out.write(p.content)
+                y.upload(f'{photo_params}.jpg', f"/{name}/{photo_params}.jpg'")
+                out.close()
+            else:
+                filter.append(photo_params)
+                out = open(f'{photo_params}.jpg', "wb")
+                out.write(p.content)
+                y.upload(f'{photo_params}.jpg', f"/{name}/{photo_params}.jpg'")
+                out.close()
         json.dump(name_list, photo)
 
 
